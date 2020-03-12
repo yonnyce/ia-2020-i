@@ -9,18 +9,11 @@ class Tree:
 
 
 class Vertex:
-    def __init__(self, name, neighbours=None):
+    def __init__(self, name):
         self.name = name
 
-        if neighbours != None:
-            self.neighbours = list()
-        else:
-            self.neighbours = neighbours
-
-    def addNeighbour(self, v):
-
-        if v not in self.neighbours:
-            self.neighbours.append(v)
+    def __str__(self):
+        return self.name
 
 
 class Edge:
@@ -29,15 +22,42 @@ class Edge:
         self.finalVertex = b
         self.cost = cost
 
+    def __str__(self):
+        return str(self.initialVertex) + ' -> ' + str(self.finalVertex) + '[{0}]'.format(self.cost)
+
 
 class Graph:
-    vertex = {}
-    isDirected = False
 
-    def addEdge(self, a, b, cost1, cost2):
+    def __init__(self, edges=[], isDirected=False):
+        self.isDirected = isDirected
+        self.edges = []
+        for edge in edges:
+            self.addEdge(edge)
 
-        if a in self.vertex and b in self.vertex:
-            self.vertex[a].addNeighbour(b)
+    def addEdge(self, edge):
 
-            if not self.isDirected:
-                self.vertex[b].addNeighbour(a)
+        if edge not in self.edges:
+            self.edges.append(edge)
+
+        if self.isDirected:
+            inverseCost = edge.cost
+            inverseEdge = Edge(
+                edge.finalVertex, edge.initialVertex, inverseCost)
+            self.edges.append(inverseEdge)
+
+    def printGraph(self):
+        for edge in self.edges:
+            print(edge)
+
+
+if __name__ == "__main__":
+
+    a = Vertex('A')
+    b = Vertex('B')
+    c = Vertex('C')
+
+    edges = [Edge(a, b, 10), Edge(b, c, 15), Edge(c, a, 35)]
+
+    graph = Graph(edges, False)
+
+    graph.printGraph()
