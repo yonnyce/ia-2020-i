@@ -1,25 +1,5 @@
 from TreeStructs import *
 
-
-class NumsState(State):
-
-    def addOne(self, state):
-        newState = NumsState(state.data + 1)
-        return newState
-
-    def getOperations(self) -> []:
-
-        addFunction = Operation('ADD ONE', self.addOne)
-
-        return [addFunction]
-
-    def isSolution(self) -> bool:
-        return self.data == 8
-
-    def __str__(self):
-        return str(self.data)
-
-
 class JarrasState(State):
 
     def getOperations(self) -> []:
@@ -81,7 +61,6 @@ class JarrasState(State):
         nuevoA = (
             state.data['A']-faltanteB) if (state.data['A']-faltanteB) > 0 else 0
 
-        # print('A:{},B:{}'.format(nuevoA,nuevoB))
         if nuevoB > 3 or nuevoA < 0:
             return None
 
