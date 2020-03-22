@@ -63,15 +63,15 @@ class Tree(abc.ABC):
 
     pendingNodes = []
     solutionNode = None
-    visitedNodes = []
+    visitedNodes = set()
 
     def __init__(self, root: Node = None, deepSearch=False):
         self.root = root
         self.deepSearch = deepSearch
 
     def start(self):
-
-        self.visitedNodes.append(self.root)
+        self.movements=0
+        self.visitedNodes.add(self.root)
         self.pendingNodes = self.root.childrensFunc()
         self.solutionNode = self.startSearch()
         return self.solutionNode
@@ -84,12 +84,13 @@ class Tree(abc.ABC):
             if currentNode in self.visitedNodes:
                 continue
 
-            self.visitedNodes.append(currentNode)
-            
+            self.visitedNodes.add(currentNode)
+
             if(currentNode.state.isSolution()):
                 return currentNode
 
             self.pendingNodes.extend(currentNode.childrensFunc())
+            self.movements+=1
 
         return None
 
@@ -97,9 +98,11 @@ class Tree(abc.ABC):
         currentNode = self.solutionNode
         solutionSteps = []
 
+        print('Total evaluated states: {}'.format(self.movements))
+
         while(currentNode != None):
             solutionSteps.insert(0, currentNode)
             currentNode = currentNode.parent
 
         for node in solutionSteps:
-            print('{1} [{0}] -> '.format(node.state, node.operation), end='')
+            print('{1} [{0}] -> '.format(str(node.state), node.operation), end='')

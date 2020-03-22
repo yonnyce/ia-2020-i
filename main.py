@@ -1,94 +1,94 @@
 from TreeStructs import *
+from copy import copy, deepcopy
 
-class JarrasState(State):
 
+class PuzzleState(State):
     def getOperations(self) -> []:
+        moverArriba = Operation('Arriba', self.moveUp)
+        moverAbajo = Operation('Abajo', self.moveDown)
+        moverDerecha = Operation('Derecha', self.moveRight)
+        moverIzquierda = Operation('Izquierda', self.moveLeft)
 
-        llenarA = Operation('Llenar A', self.llenarA)
-        llenarB = Operation('Llenar B', self.llenarB)
-        vaciarA = Operation('Vaciar A', self.vaciarA)
-        vaciarB = Operation('Vaciar B', self.vaciarB)
-        pasarAaB = Operation('Pasar A a B', self.pasarAaB)
-        pasarBaA = Operation('Pasar B a A', self.pasarBaA)
-
-        return [llenarA, llenarB, vaciarA, vaciarB, pasarAaB, pasarBaA]
+        return [moverArriba, moverAbajo, moverDerecha, moverIzquierda]
 
     def isSolution(self) -> bool:
-        return self.data['A'] == 4
+        return self.data == [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+
+    def findVoidIndex(self, state):
+        for i in range(0, len(state.data)):
+            for j in range(0, len(state.data[i])):
+                if(state.data[i][j] == 0):
+                    return [i, j]
+
+    def validMovement(self, state, i, j):
+        valid = True
+
+        if(i >= len(state.data)):
+            valid = False
+
+        if(i < 0):
+            valid = False
+
+        if(j >= len(state.data[0])):
+            valid = False
+
+        if(j < 0):
+            valid = False
+
+        return valid
+
+    def moveUp(self, state):
+        newState=self.move(state, -1, 0)
+        return newState
+
+    def moveDown(self, state):
+        newState=self.move(state, 1, 0)
+        return newState
+
+    def moveRight(self, state):
+        newState=self.move(state, 0, 1)
+        return newState
+
+    def moveLeft(self, state):
+        newState=self.move(state, 0, -1)
+        return newState
+
+    def move(self, state, addI, addJ):
+        voidIndexArray = self.findVoidIndex(state)
+        i = voidIndexArray[0]
+        j = voidIndexArray[1]
+
+        newI = i + addI
+        newJ = j + addJ
+
+        if(not self.validMovement(state, newI, newJ)):
+            return None
+
+        newData = deepcopy(state.data)
+
+        newData[i][j] = newData[newI][newJ]
+        newData[newI][newJ] = 0
+        
+        return PuzzleState(newData)
 
     def __str__(self):
-        return 'A:{0}, B:{1}'.format(self.data['A'], self.data['B'])
+        string = '\n'
+        for i in range(0, len(self.data)):
+            for j in range(0, len(self.data[i])):
+                string += str(self.data[i][j])+' '
+            string += '\n'
+
+        string += '\n'
+        return string
+
 
     def __hash__(self):
-        hash(self.data)
+        return hash(str(self))
 
-    def llenarA(self, state):
-        if(state.data['A'] == 5):
-            return None
-
-        newState = JarrasState({'A': 5, 'B': state.data['B']})
-        return newState
-
-    def llenarB(self, state):
-        if(state.data['B'] == 3):
-            return None
-
-        newState = JarrasState({'A': state.data['A'], 'B': 3})
-        return newState
-
-    def vaciarA(self, state):
-        if(state.data['A'] == 0):
-            return None
-
-        newState = JarrasState({'A': 0, 'B': state.data['B']})
-        return newState
-
-    def vaciarB(self, state):
-        if(state.data['B'] == 0):
-            return None
-        newState = JarrasState({'A': state.data['A'], 'B': 0})
-        return newState
-
-    def pasarAaB(self, state):
-        if(state.data['A'] == 0 or state.data['B'] == 3):
-            return None
-
-        faltanteB = 3 - state.data['B']
-
-        nuevoB = state.data['B'] + faltanteB if (
-            state.data['A']-faltanteB) > 0 else state.data['B'] + state.data['A']
-
-        nuevoA = (
-            state.data['A']-faltanteB) if (state.data['A']-faltanteB) > 0 else 0
-
-        if nuevoB > 3 or nuevoA < 0:
-            return None
-
-        newState = JarrasState({'A': nuevoA, 'B': nuevoB})
-
-        return newState
-
-    def pasarBaA(self, state):
-        if(state.data['B'] == 0 or state.data['A'] == 5):
-            return None
-
-        faltanteA = 5 - state.data['A']
-
-        nuevoA = state.data['A'] + faltanteA if (
-            state.data['B']-faltanteA) > 0 else state.data['A'] + state.data['B']
-
-        nuevoB = (
-            state.data['B']-faltanteA) if (state.data['B']-faltanteA) > 0 else 0
-
-        if nuevoA > 5 or nuevoB < 0:
-            return None
-
-        newState = JarrasState({'A': nuevoA, 'B': nuevoB})
-
-        return newState
 
 
 if __name__ == "__main__":
-    tree = Tree(Node(JarrasState({'A': 0, 'B': 0})))
-    solutionNode = tree.start()
-    tree.printSolution()
+     tree = Tree(Node(PuzzleState([[1,2,5],[3,4,8],[6,7,0]])))
+     solutionNode = tree.start()
+     tree.printSolution()
+
