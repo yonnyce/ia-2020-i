@@ -1,11 +1,16 @@
 import abc
+import operator
 
 
 class Operation:
 
-    def __init__(self, name, function):
+    def __init__(self, name, function, cost=0):
         self.name = name
         self.function = function
+        self.cost = cost
+
+    def __str__(self):
+        return self.name + '({})'.format(str(self.cost))
 
 
 class State(abc.ABC):
@@ -27,11 +32,11 @@ class State(abc.ABC):
 
 class Node(abc.ABC):
 
-    parent = None
-
-    def __init__(self, state, operation='None'):
+    def __init__(self, state, operation=Operation('None', None), parent=None):
         self.state = state
         self.operation = operation
+        self.parent = parent
+        self.acumCost = parent.acumCost+operation.cost if parent != None else 0
 
     def __eq__(self, obj):
         return self.state == obj.state if obj != None and isinstance(obj, Node) else False
@@ -51,9 +56,8 @@ class Node(abc.ABC):
             if newState is None:
                 continue
 
-            newNode = Node(newState, operation.name)
+            newNode = Node(newState, operation, self)
 
-            newNode.parent = self
             childs.append(newNode)
 
         return childs
@@ -65,12 +69,13 @@ class Tree(abc.ABC):
     solutionNode = None
     visitedNodes = set()
 
-    def __init__(self, root: Node = None, deepSearch=False):
+    def __init__(self, root: Node = None, deepSearch=False, uniformCost=False):
         self.root = root
-        self.deepSearch = deepSearch
+        self.deepSearch = deepSearch if not uniformCost else False
+        self.uniformCost = uniformCost
 
     def start(self):
-        self.movements=0
+        self.movements = 0
         self.visitedNodes.add(self.root)
         self.pendingNodes = self.root.childrensFunc()
         self.solutionNode = self.startSearch()
@@ -90,7 +95,11 @@ class Tree(abc.ABC):
                 return currentNode
 
             self.pendingNodes.extend(currentNode.childrensFunc())
-            self.movements+=1
+
+            if self.uniformCost:
+                self.pendingNodes.sort(key=operator.attrgetter('acumCost'))
+
+            self.movements += 1
 
         return None
 
@@ -105,4 +114,5 @@ class Tree(abc.ABC):
             currentNode = currentNode.parent
 
         for node in solutionSteps:
-            print('{1} [{0}] -> '.format(str(node.state), node.operation), end='')
+            print('<{2}> {1} [{0}] -> '.format(str(node.state),
+                                               str(node.operation), str(node.acumCost)), end='')

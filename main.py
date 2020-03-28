@@ -4,10 +4,10 @@ from copy import copy, deepcopy
 
 class PuzzleState(State):
     def getOperations(self) -> []:
-        moverArriba = Operation('Arriba', self.moveUp)
-        moverAbajo = Operation('Abajo', self.moveDown)
-        moverDerecha = Operation('Derecha', self.moveRight)
-        moverIzquierda = Operation('Izquierda', self.moveLeft)
+        moverArriba = Operation('Arriba', self.moveUp, 1)
+        moverAbajo = Operation('Abajo', self.moveDown, 1)
+        moverDerecha = Operation('Derecha', self.moveRight, 1)
+        moverIzquierda = Operation('Izquierda', self.moveLeft, 1)
 
         return [moverArriba, moverAbajo, moverDerecha, moverIzquierda]
 
@@ -38,19 +38,19 @@ class PuzzleState(State):
         return valid
 
     def moveUp(self, state):
-        newState=self.move(state, -1, 0)
+        newState = self.move(state, -1, 0)
         return newState
 
     def moveDown(self, state):
-        newState=self.move(state, 1, 0)
+        newState = self.move(state, 1, 0)
         return newState
 
     def moveRight(self, state):
-        newState=self.move(state, 0, 1)
+        newState = self.move(state, 0, 1)
         return newState
 
     def moveLeft(self, state):
-        newState=self.move(state, 0, -1)
+        newState = self.move(state, 0, -1)
         return newState
 
     def move(self, state, addI, addJ):
@@ -68,7 +68,7 @@ class PuzzleState(State):
 
         newData[i][j] = newData[newI][newJ]
         newData[newI][newJ] = 0
-        
+
         return PuzzleState(newData)
 
     def __str__(self):
@@ -81,14 +81,12 @@ class PuzzleState(State):
         string += '\n'
         return string
 
-
     def __hash__(self):
         return hash(str(self))
 
 
-
 if __name__ == "__main__":
-     tree = Tree(Node(PuzzleState([[1,2,5],[3,4,8],[6,7,0]])))
-     solutionNode = tree.start()
-     tree.printSolution()
-
+    initialNode = Node(PuzzleState([[1, 2, 5], [3, 4, 8], [6, 7, 0]]))
+    tree = Tree(initialNode, False, False)
+    solutionNode = tree.start()
+    tree.printSolution()
