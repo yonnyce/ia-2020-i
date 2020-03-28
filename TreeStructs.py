@@ -130,7 +130,7 @@ class Tree(abc.ABC):
 
     def startSearch(self):
         """
-        Implement the principal loop of search, creating and evaluationg each node
+        Implement the principal loop of search, creation and evaluation of each node
         """
 
         while(len(self.pendingNodes) != 0):
